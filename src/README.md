@@ -2,12 +2,11 @@ xd-h3c
 ======
 xd-h3c是适用于西电北校区的UNIX/Linux网络客户端。    
 纯CLI，在系统无法进入GUI（无法使用官方客户端）而又需要网络进行修复时，是一个很好的选择。   
-当然，如果你追求高效或是想找一个在OpenWRT运行的校园网客户端，xd-h3c也是个很不错的选择。  
-本源码是修改自https://github.com/godspeed1989/xd-h3c ，作者将其按需求移植到wndr3800 openwrt trunk系统下，经长期测试运行稳定。
+当然，如果你追求高效或是想找一个在OpenWRT运行的校园网客户端，xd-h3c也是个很不错的选择。   
 
 CONTACT
 =======
-jef199006@gmail.com
+godspeed1989@gmail.com
 
 INSTALL
 =======

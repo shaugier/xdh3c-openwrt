@@ -1,31 +1,38 @@
-CC=gcc
-BIN=xdh3c
-LIBS= -lpcap -lm
-CFLAGS=-Wall
-INSTALL=install
-RM=rm
+#
+# Copyright (C) 2011-2014 OpenWrt.org
+#
+# This is free software, licensed under the GNU General Public License v2.
+# See /LICENSE for more information.
+#
 
-all: $(BIN)
+include $(TOPDIR)/rules.mk
 
-xd_h3c.o: xd_h3c.c
-	$(CC) $(CFLAGS) -c $<
+PKG_NAME:=xdh3c
+PKG_VERSION:=0.0.2
+PKG_RELEASE:=1
 
-authenticate.o: authenticate.c authenticate.h
-	$(CC) $(CFLAGS) -c $<
+include $(INCLUDE_DIR)/package.mk
 
-md5.o: ./md5/md5.c
-	$(CC) $(CFLAGS) -c $<
+define	Build/Prepare	
+	mkdir	-p	$(PKG_BUILD_DIR)	
+	$(CP)	-ar ./src/* $(PKG_BUILD_DIR)/	
+endef	
 
-$(BIN): xd_h3c.o authenticate.o md5.o
-	$(CC) $(CFLAGS) $+ $(LIBS) -o $@
+define Package/xdh3c
+  SECTION:=net
+  CATEGORY:=Network
+  TITLE:=xdh3c client 
+  DEPENDS:=+libpcap
+endef
 
-install:
-	$(INSTALL) -d /usr/local/bin
-	$(INSTALL) -p -D -m 0755 $(BIN) /usr/local/bin
+define Package/xdh3c/description
+  xdh3c is an network cient in xidian university north yard.it can work on wndr3800 changed by jefby 2014-05-09.
+endef
 
-uninstall:
-	$(RM) -rf /usr/local/bin/$(BIN)
+define Package/xdh3c/install
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/xdh3c $(1)/usr/bin/
+endef
 
-clean:
-	@$(RM) -rf *.o $(BIN)
 
+$(eval $(call BuildPackage,xdh3c))

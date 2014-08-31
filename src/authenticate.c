@@ -1,3 +1,14 @@
+/*
+	delete the command of using "sudo",in openwrt bb 's busybox ,not include sudo command!
+	
+	在openwrt中使用的dhcp请求客户端是udhcpc，而不是inode默认的dhclient，所以需要修改源码.
+
+	2014/05/09 修改dhcpc客户端请求应用程序
+	Change : jefby
+	Email : jef199006@gmail.com
+	
+	
+*/
 #include "authenticate.h"
 #include "md5/md5.h"
 
@@ -16,10 +27,13 @@ void RunDHCP(const char *DeviceName)
 	char cmd[32];
 	fprintf(stdout, "------开始运行DHCP服务获取IP------\n");
 	//TODO: detect the existing dhclient and exit them
-	strcpy(cmd, "sudo dhclient ");
+	system("killall -q -9 udhcpc");//added by jefby.used in openwrt trunck bb.
+	//use udhcpc(dhcp client) application get the ip address 
+	strcpy(cmd, "udhcpc -R -i");//ADD -R parameter，means exit with release the ip address. 2014/05/10 jefby.
 	strcat(cmd, DeviceName);
 	strcat(cmd, " &");
 	system(cmd);
+
 	fprintf(stdout, "----------------------------------\n");
 }
 
@@ -36,7 +50,9 @@ void PrintErrTypes()
 	fprintf(stdout, "E63025->MAC地址绑定错误\n");
 	fprintf(stdout, "E63032->用户密码错误\n");
 }
-
+/*
+	使用用户名/密码，发出DHCP请求，获取IP地址
+*/
 void DispatchRequest(char *UserName, char *Password, char *DeviceName,
 					 pcap_t	*adhandle, uint8_t ethhdr[14], const uint8_t *captured)
 {
@@ -270,14 +286,15 @@ void SendLogoffPkt(char *DeviceName)
 
 	/* 发送 */
 	pcap_sendpacket(adhandle, packet, sizeof(packet));
+	system("killall udhcpc");//added by jefby.主要用于解决下线后依然保持有IP地址，会给管理员以错觉。以为网络是好的。
 	printf("\n注销成功。\n");
 }
 
 /* 回应Identity类型的请求，返回IP和用户名 */
 void ResponseIdentity(pcap_t *adhandle, const uint8_t* request ,
-										const uint8_t ethhdr[14],
-										const uint8_t ip[4],
-										const char* username)
+					const uint8_t ethhdr[14],
+					const uint8_t ip[4],
+					const char* username)
 {
 	size_t i, usernamelen;
 	uint8_t response[128];
@@ -552,7 +569,7 @@ int GetNetState(char *devicename)
 	FILE *read_fp;
 	int chars_read, ret;
 	char command[100], buffer[BUFSIZ];
-	strcpy(command,"sudo ifconfig ");
+	strcpy(command,"ifconfig ");
 	strcat(command, devicename);
 	strcat(command," | grep RUNNING");
 	memset(buffer, 0, BUFSIZ);
@@ -600,8 +617,8 @@ void FillBase64Area(uint8_t area[28])
 	uint8_t	c1, c2, c3;
 	uint8_t version[20];
 	const char* Tbl =	"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-						"abcdefghijklmnopqrstuvwxyz"
-						"0123456789+/"; // 标准的Base64字符映射表
+				"abcdefghijklmnopqrstuvwxyz"
+				"0123456789+/"; // 标准的Base64字符映射表
 
 	/* 首先生成20字节加密过的H3C版本号信息 */
 	FillClientVersionArea(version);

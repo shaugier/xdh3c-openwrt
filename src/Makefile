@@ -11,7 +11,7 @@
 
 CC=mips-openwrt-linux-gcc
 BIN=xdh3c
-LIBS= -lm -L /home/jefby/workplace/openwrt/trunk/build_dir/target-mips_34kc_uClibc-0.9.33.2/libpcap-1.5.3/ -lpcap -dynamic
+LIBS= -lm -lpcap -dynamic
 CFLAGS=-Wall
 RM=rm
 
